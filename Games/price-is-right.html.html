@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Price is Right: Team Showdown</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for showing/hiding screens */
+        .screen {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .hidden-screen {
+            display: none;
+            opacity: 0;
+        }
+         /* Custom animation for winner highlight */
+        @keyframes winner-pulse {
+            0%, 100% { transform: scale(1.05); box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.7); }
+            50% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(253, 224, 71, 0); }
+        }
+        .winner-animation {
+            animation: winner-pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-extrabold tracking-tighter mb-2 text-yellow-300">The Price is Right</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8">Team Showdown Edition</p>
+            <button id="start-game-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold text-2xl py-4 px-10 rounded-lg shadow-lg transition transform hover:scale-105">
+                Start Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen hidden-screen min-h-screen p-4 sm:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <header class="text-center mb-6">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter text-yellow-300">The Price is Right</h1>
+                <p id="theme-text" class="text-xl text-gray-300 mt-1">Theme: 3C Gadgets</p>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                    <div id="progress-bar" class="bg-yellow-400 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                
+                <!-- Boys Team Panel -->
+                <div id="boys-panel" class="lg:col-span-1 order-2 lg:order-1 flex flex-col items-center p-6 rounded-2xl shadow-lg bg-blue-600 bg-opacity-80 transition-all duration-500">
+                    <h2 class="text-3xl font-bold text-white mb-4">Boys Team</h2>
+                    <div id="boys-score" class="text-5xl font-extrabold text-white tracking-tighter mb-6 bg-black bg-opacity-20 px-6 py-2 rounded-lg">0</div>
+                    <div class="w-full">
+                        <label for="boys-bid" class="block text-sm font-medium text-white mb-2">Enter Your Bid (NT$):</label>
+                        <input type="number" id="boys-bid" placeholder="0" class="w-full p-3 rounded-lg border-2 border-blue-400 text-gray-900 font-bold text-xl text-center shadow-inner transition focus:ring-blue-500 bg-white">
+                    </div>
+                </div>
+
+                <!-- Center Column: Item Display & Status -->
+                <div class="lg:col-span-1 order-1 lg:order-2 space-y-4">
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-2xl text-center border-2 border-gray-700">
+                        <h3 id="item-name" class="text-3xl font-bold text-white mb-4">Item Name</h3>
+                        <div class="relative w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gray-700">
+                            <img id="item-image" src="https://placehold.co/600x400/374151/9ca3af?text=Item+Image" alt="Item to be bid on" class="w-full h-full object-cover">
+                        </div>
+                        <div id="price-reveal-section" class="transition-opacity duration-700 opacity-0">
+                            <p class="text-xl text-gray-300 mb-2">Actual Retail Price:</p>
+                            <p id="item-price" class="text-5xl font-black text-green-400 tracking-tight bg-black bg-opacity-25 py-3 rounded-lg">NT$ 0</p>
+                        </div>
+                    </div>
+                    <div id="game-status" class="text-center p-4 rounded-lg text-white font-bold text-2xl transition-all duration-300 bg-gray-700 shadow-md hidden">
+                        Welcome!
+                    </div>
+                </div>
+                
+                <!-- Girls Team Panel -->
+                <div id="girls-panel" class="lg:col-span-1 order-3 lg:order-3 flex flex-col items-center p-6 rounded-2xl shadow-lg bg-pink-600 bg-opacity-80 transition-all duration-500">
+                    <h2 class="text-3xl font-bold text-white mb-4">Girls Team</h2>
+                    <div id="girls-score" class="text-5xl font-extrabold text-white tracking-tighter mb-6 bg-black bg-opacity-20 px-6 py-2 rounded-lg">0</div>
+                    <div class="w-full">
+                        <label for="girls-bid" class="block text-sm font-medium text-white mb-2">Enter Your Bid (NT$):</label>
+                        <input type="number" id="girls-bid" placeholder="0" class="w-full p-3 rounded-lg border-2 border-pink-400 text-gray-900 font-bold text-xl text-center shadow-inner transition focus:ring-pink-500 bg-white">
+                    </div>
+                </div>
+            </main>
+            
+            <!-- Controls -->
+            <footer id="controls" class="text-center mt-6">
+                <button id="lock-bids-btn" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold text-xl py-3 px-12 rounded-lg shadow-lg transition transform hover:scale-105">
+                    Lock In Bids
+                </button>
+                <button id="next-item-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xl py-3 px-12 rounded-lg shadow-lg transition transform hover:scale-105 hidden animate-pulse">
+                    Next Item
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="screen hidden-screen min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <h1 class="text-5xl font-extrabold tracking-tighter mb-4">Game Over!</h1>
+        <p id="end-message" class="text-3xl font-bold mb-8">Winner is announced here!</p>
+        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 text-2xl mb-12">
+            <p><span class="font-bold text-blue-400">Boys Team Final Score:</span> <span id="final-boys-score">0</span></p>
+            <p><span class="font-bold text-pink-400">Girls Team Final Score:</span> <span id="final-girls-score">0</span></p>
+        </div>
+        <button id="play-again-btn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xl py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105">
+            Play Again
+        </button>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- GAME DATA ---
+        const gameData = [
+            {
+                theme: '3C Gadgets',
+                items: [
+                    { name: 'Apple AirPods Pro 2', price: 7490, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/AirPods_Pro_%282nd_generation%29.jpg/500px-AirPods_Pro_%282nd_generation%29.jpg' },
+                    { name: 'Nintendo Switch (OLED model)', price: 10480, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Nintendo_Switch_%E2%80%93_OLED-Modell%2C_Konsole_und_Dock_20230506.png/500px-Nintendo_Switch_%E2%80%93_OLED-Modell%2C_Konsole_und_Dock_20230506.png' },
+                    { name: 'Logitech MX Master 3S Mouse', price: 3990, imageUrl: 'https://www.trustedreviews.com/wp-content/uploads/sites/7/2022/06/Logitech-MX-Master-3S-1-scaled-820x461.jpg' },
+                ]
+            },
+            {
+                theme: 'Household Items',
+                items: [
+                    { name: 'Dyson V12 Detect Slim Vacuum', price: 21900, imageUrl: 'https://moderncastle.com/wp-content/uploads/2022/06/dyson-v12-detect-slim-wp.jpg' },
+                    { name: 'Tatung 10-Cup Rice Cooker', price: 3290, imageUrl: 'https://us.tatung.com/Upload/CkEditorFile/1698996322_1.jpg' },
+                    { name: 'Philips Air Fryer HD9270', price: 5990, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Air_Fryer_5458.jpg/500px-Air_Fryer_5458.jpg' },
+                ]
+            },
+            {
+                theme: 'Video Games',
+                items: [
+                    { name: 'PlayStation 5 Console (Slim)', price: 17580, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Black_and_white_Playstation_5_base_edition_with_controller.png/330px-Black_and_white_Playstation_5_base_edition_with_controller.png' },
+                    { name: 'The Legend of Zelda: Tears of the Kingdom', price: 1850, imageUrl: 'https://upload.wikimedia.org/wikipedia/en/f/fb/The_Legend_of_Zelda_Tears_of_the_Kingdom_cover.jpg' },
+                ]
+            },
+            {
+                theme: 'Collectible Cards',
+                items: [
+                    { name: 'Pokémon TCG: Charizard ex (SIR)', price: 8752.26, imageUrl: 'https://tcgplayer-cdn.tcgplayer.com/product/517045_in_600x600.jpg' },
+                    { name: 'Pokémon TCG: Charizard Tera ', price: 8477.80, imageUrl: 'https://tcgplayer-cdn.tcgplayer.com/product/509980_in_600x600.jpg' },
+                    { name: 'Pokémon TCG: Lugia V silver Tempest ', price: 11522.61, imageUrl: 'https://tcgplayer-cdn.tcgplayer.com/product/451834_in_600x600.jpg' },
+                    
+                ]
+            },
+            {
+                theme: 'Designer Shoes & Bags',
+                items: [
+                    { name: 'Nike Dunk Low "Panda"', price: 3600, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Panda_Nike_Dunk.jpg/500px-Panda_Nike_Dunk.jpg' },
+                    { name: 'Longchamp Le Pliage Tote (Large)', price: 5300, imageUrl: 'https://cdn-images.farfetch-contents.com/18/40/43/98/18404398_39834395_1000.jpg' },
+                ]
+            },
+            {
+                theme: 'Random Items',
+                items: [
+                    { name: 'LEGO Icons Orchid Set', price: 1799, imageUrl: 'https://lzd-img-global.slatic.net/g/p/edd2290cee3288608222dfb589071ff6.png_720x720q80.png' },
+                    { name: 'Giant 150cm Snorlax Plush', price: 4500, imageUrl: 'https://i.etsystatic.com/58566602/r/il/11c4f1/6956505212/il_600x600.6956505212_2rle.jpg' },
+                ]
+            }
+        ];
+
+        // --- STATE VARIABLES ---
+        let gameState = 'start'; // 'start', 'bidding', 'reveal', 'end'
+        let teams = {
+            boys: { score: 0 },
+            girls: { score: 0 }
+        };
+        let currentThemeIndex = 0;
+        let currentItemIndex = 0;
+        let roundWinner = null;
+        const totalItems = gameData.reduce((acc, theme) => acc + theme.items.length, 0);
+
+        // --- DOM ELEMENTS ---
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            end: document.getElementById('end-screen')
+        };
+        const buttons = {
+            start: document.getElementById('start-game-btn'),
+            lockBids: document.getElementById('lock-bids-btn'),
+            nextItem: document.getElementById('next-item-btn'),
+            playAgain: document.getElementById('play-again-btn')
+        };
+        const inputs = {
+            boysBid: document.getElementById('boys-bid'),
+            girlsBid: document.getElementById('girls-bid')
+        };
+        const displays = {
+            theme: document.getElementById('theme-text'),
+            progressBar: document.getElementById('progress-bar'),
+            boysScore: document.getElementById('boys-score'),
+            girlsScore: document.getElementById('girls-score'),
+            boysPanel: document.getElementById('boys-panel'),
+            girlsPanel: document.getElementById('girls-panel'),
+            itemName: document.getElementById('item-name'),
+            itemImage: document.getElementById('item-image'),
+            priceReveal: document.getElementById('price-reveal-section'),
+            itemPrice: document.getElementById('item-price'),
+            gameStatus: document.getElementById('game-status'),
+            endMessage: document.getElementById('end-message'),
+            finalBoysScore: document.getElementById('final-boys-score'),
+            finalGirlsScore: document.getElementById('final-girls-score')
+        };
+
+        // --- UI UPDATE FUNCTIONS ---
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(screen => {
+                screen.classList.add('hidden-screen');
+            });
+            screens[screenName].classList.remove('hidden-screen');
+        }
+
+        function updateUI() {
+            // Update scores
+            displays.boysScore.textContent = teams.boys.score.toLocaleString();
+            displays.girlsScore.textContent = teams.girls.score.toLocaleString();
+            
+            // Update item display
+            const currentItem = gameData[currentThemeIndex].items[currentItemIndex];
+            displays.theme.textContent = `Theme: ${gameData[currentThemeIndex].theme}`;
+            displays.itemName.textContent = currentItem.name;
+            displays.itemImage.src = currentItem.imageUrl;
+            displays.itemImage.alt = currentItem.name;
+            displays.itemPrice.textContent = `NT$ ${currentItem.price.toLocaleString()}`;
+            
+            // Update progress bar
+            const itemsPlayed = gameData.slice(0, currentThemeIndex).reduce((acc, theme) => acc + theme.items.length, 0) + currentItemIndex;
+            displays.progressBar.style.width = `${((itemsPlayed + 1) / totalItems) * 100}%`;
+            
+            // Handle game state changes
+            inputs.boysBid.disabled = gameState !== 'bidding';
+            inputs.girlsBid.disabled = gameState !== 'bidding';
+
+            buttons.lockBids.style.display = gameState === 'bidding' ? 'inline-block' : 'none';
+            buttons.nextItem.style.display = gameState === 'reveal' ? 'inline-block' : 'none';
+
+            if (gameState === 'bidding') {
+                displays.priceReveal.classList.add('opacity-0');
+                displays.gameStatus.classList.add('hidden');
+                inputs.boysBid.value = '';
+                inputs.girlsBid.value = '';
+                displays.boysPanel.classList.remove('winner-animation');
+                displays.girlsPanel.classList.remove('winner-animation');
+            }
+        }
+        
+        function showGameStatus(message, winner) {
+            displays.gameStatus.textContent = message;
+            displays.gameStatus.classList.remove('hidden', 'bg-gray-700', 'bg-blue-500', 'bg-pink-500', 'bg-purple-600');
+            let colorClass = 'bg-gray-700';
+            if (winner === 'boys') colorClass = 'bg-blue-500';
+            if (winner === 'girls') colorClass = 'bg-pink-500';
+            if (winner === 'tie' || winner === 'over') colorClass = 'bg-purple-600';
+            displays.gameStatus.classList.add(colorClass);
+        }
+
+        // --- GAME LOGIC FUNCTIONS ---
+        function startGame() {
+            gameState = 'bidding';
+            switchScreen('game');
+            updateUI();
+        }
+
+        function lockBids() {
+            const boyBid = parseInt(inputs.boysBid.value, 10) || 0;
+            const girlBid = parseInt(inputs.girlsBid.value, 10) || 0;
+
+            if (boyBid === 0 || girlBid === 0) {
+                showGameStatus("Both teams must place a bid!", null);
+                displays.gameStatus.classList.remove('hidden');
+                return;
+            }
+
+            gameState = 'reveal';
+            displays.priceReveal.classList.remove('opacity-0');
+
+            const actualPrice = gameData[currentThemeIndex].items[currentItemIndex].price;
+            const boyDiff = actualPrice - boyBid;
+            const girlDiff = actualPrice - girlBid;
+            const isBoyOver = boyDiff < 0;
+            const isGirlOver = girlDiff < 0;
+            
+            let message = '';
+            
+            if (isBoyOver && isGirlOver) {
+                roundWinner = 'over';
+                message = "Oh no! Both teams went over!";
+            } else if (isBoyOver) {
+                roundWinner = 'girls';
+                message = "Girls Team wins the round!";
+            } else if (isGirlOver) {
+                roundWinner = 'boys';
+                message = "Boys Team wins the round!";
+            } else {
+                if (boyDiff < girlDiff) {
+                    roundWinner = 'boys';
+                    message = "Boys Team wins the round!";
+                } else if (girlDiff < boyDiff) {
+                    roundWinner = 'girls';
+                    message = "Girls Team wins the round!";
+                } else {
+                    roundWinner = 'tie';
+                    message = "It's a perfect tie! No points awarded.";
+                }
+            }
+            
+            showGameStatus(message, roundWinner);
+            
+            if (roundWinner === 'boys') {
+                displays.boysPanel.classList.add('winner-animation');
+            } else if (roundWinner === 'girls') {
+                displays.girlsPanel.classList.add('winner-animation');
+            }
+
+            updateUI();
+        }
+
+        function nextItem() {
+            // Update scores
+            if (roundWinner === 'boys' || roundWinner === 'girls') {
+                teams[roundWinner].score += 100;
+            }
+
+            // Move to next item/theme
+            currentItemIndex++;
+            if (currentItemIndex >= gameData[currentThemeIndex].items.length) {
+                currentItemIndex = 0;
+                currentThemeIndex++;
+            }
+
+            if (currentThemeIndex >= gameData.length) {
+                endGame();
+            } else {
+                gameState = 'bidding';
+                updateUI();
+            }
+        }
+        
+        function endGame() {
+            gameState = 'end';
+            let message = '';
+            if (teams.boys.score > teams.girls.score) {
+                message = `Boys Team wins with ${teams.boys.score.toLocaleString()} points!`;
+            } else if (teams.girls.score > teams.boys.score) {
+                message = `Girls Team wins with ${teams.girls.score.toLocaleString()} points!`;
+            } else {
+                message = `It's a draw at ${teams.boys.score.toLocaleString()} points!`;
+            }
+            
+            displays.endMessage.textContent = message;
+            displays.finalBoysScore.textContent = teams.boys.score.toLocaleString();
+            displays.finalGirlsScore.textContent = teams.girls.score.toLocaleString();
+            switchScreen('end');
+        }
+        
+        function resetGame() {
+            gameState = 'start';
+            teams = { boys: { score: 0 }, girls: { score: 0 } };
+            currentThemeIndex = 0;
+            currentItemIndex = 0;
+            roundWinner = null;
+            updateUI();
+            switchScreen('start');
+        }
+
+        // --- EVENT LISTENERS ---
+        buttons.start.addEventListener('click', startGame);
+        buttons.lockBids.addEventListener('click', lockBids);
+        buttons.nextItem.addEventListener('click', nextItem);
+        buttons.playAgain.addEventListener('click', resetGame);
+        
+        // Ensure only numbers are entered in bid inputs
+        [inputs.boysBid, inputs.girlsBid].forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
+        });
+    });
+    </script>
+</body>
+</html>
